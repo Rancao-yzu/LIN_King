@@ -19,8 +19,9 @@ LIN_King/
 
 ---
 使用前必读！
-> [build.md](build.md) - 驱动安装指南;  
-> [Lin.md](Lin.md) - 通信原理
+> linux下的驱动文件见  __lib/usbcanfd_libusb_x64_1.0.13_260316.zip  
+> [build.md](lib/build.md) - 驱动安装指南;  
+> [Lin.md](lib/Lin.md) - 通信原理  
 
 
 
