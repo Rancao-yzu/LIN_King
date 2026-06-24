@@ -9,7 +9,7 @@ from datetime import datetime
 import serial
 # ============================================================
 # 配置: 串口设备路径, 为空则运行 demo
-SERIAL_PORT = "/dev/ttyUSB0"        # 例如 "/dev/ttyUSB0"
+SERIAL_PORT = ""        # 例如 "/dev/ttyUSB0"
 SERIAL_BAUD = 6250000
 
 # ============================================================
@@ -78,6 +78,7 @@ class Parser:
             payload = raw[HEADER_SIZE:total_len]
             off = 0
 
+            #跳过 TLV Header（8字节）和 PointUnit（20字节），共28字节
             # TLV: type + length
             tlv_type, tlv_len = struct.unpack_from(TLV_FMT, payload, off); off += TLV_SIZE
             # PointUnit: 5个float
@@ -96,7 +97,8 @@ class Parser:
             self.frame_cnt += 1
             frames.append({
                 'hdr': hdr, 'tlv': (tlv_type, tlv_len),
-                'unit': (eu, au, du, ru, su), 'pts': points})
+                'unit': (eu, au, du, ru, su), 'pts': points,
+                'raw': raw})  # 原始完整报文
         return frames
 
 
@@ -104,8 +106,15 @@ class Parser:
 def write_frame(f, frame, idx):
     """将单帧解析结果写入日志文件"""
     h = frame['hdr']
+    # 原始报文 hex dump
+    raw = frame['raw']
+    f.write(f"\n\n--- Frame #{idx} raw({len(raw)}B) ---\n")
+    for i in range(0, len(raw), 32):
+        line = raw[i:i+32]
+        hex_part = ' '.join(f'{b:02X}' for b in line)
+        f.write(f"  {i:04X}: {hex_part}\n")
     # header 各字段: 
-    f.write(f"\n\n--- Frame #{idx} (frameNumber={h[7]}) points={h[9]} ---\n")
+    f.write(f"\n--- Frame #{idx} (frameNumber={h[7]}) points={h[9]} ---\n")
     f.write(f"  magic={[f'0x{w:04X}' for w in h[0:4]]} ver=0x{h[4]:08X} totalLen={h[5]} plat=0x{h[6]:05X}\n")
     f.write(f"  time={h[8]} numTLVs={h[11]} subFrame={h[12]}\n")
     u = frame['unit']
