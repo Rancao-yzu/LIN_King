@@ -15,6 +15,7 @@ LIN_King/
 │   ├── zcan.h                  ← C 头文件
 │   ├── testLin.c               ← LIN 主从通讯 C demo
 │   └── test.c                  ← CAN/CANFD + 设备信息 C demo
+├── UART_Serial_6844/            ← 串口通信(Ti)
 ```
 
 ---
@@ -22,6 +23,7 @@ LIN_King/
 > linux下的驱动文件见  __lib/usbcanfd_libusb_x64_1.0.13_260316.zip  
 > [build.md](lib/build.md) - 驱动安装指南;  
 > [Lin.md](lib/Lin.md) - 通信原理  
+> [UART_Serial_6844](UART_Serial_6844/6844通信.md) - 串口通信(Ti)
 
 
 
