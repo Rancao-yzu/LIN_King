@@ -223,8 +223,8 @@ class LinController:
         info = {
             'learn_done': data[0] == 0x01,
             'position': data[1] | (data[2] << 8),
-            'max_stroke': data[3],
-            'fault': data[4],
+            'max_stroke': data[3] | (data[4] << 8),  # 最大行程改为双字节（低字节在前）
+            'fault': data[5],  # 故障帧移至 DATA[5]
         }
         if self._cb_motor_status:
             self._cb_motor_status(info)
