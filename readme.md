@@ -21,9 +21,9 @@ LIN_King/
 ---
 使用前必读！
 > linux下的驱动文件见  __lib/usbcanfd_libusb_x64_1.0.13_260316.zip  
-> [build.md](lib/build.md) - 驱动安装指南;  
-> [Lin.md](lib/Lin.md) - 通信原理  
-> [UART_Serial_6844](UART_Serial_6844/6844通信.md) - 串口通信(Ti)
+> [build.md](docx/build.md) - 驱动安装指南;  
+> [Lin.md](docx/Lin.md) - 通信原理  
+> [UART_Serial_6844](docx/6844通信.md) - 串口通信(Ti)
 
 
 

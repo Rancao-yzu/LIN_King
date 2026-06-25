@@ -1,0 +1,158 @@
+zjh@zjh-XPS-13-9360:~/桌面/LIN_King/UART_Serial_6844$ bash start.sh
+[sudo] zjh 的密码：       
+============================================================
+TI雷达集成工具 - 配置+接收+解析
+============================================================
+连接控制端口: /dev/ttyACM0
+---控制端口已连接 @ 115200 baud
+连接数据端口: /dev/ttyACM1
+---数据端口已连接 @ 1250000 baud
+
+发送配置文件: cpd_bottomShafa_20260610_oneZone.cfg
+============================================================
+发送: sensorStop 0
+响应: sensorStop 0
+响应: mmwDemo:/>
+发送: channelCfg 15 15 0
+响应: mmwDemo:/>channelCfg 15 15 0
+响应: Done
+发送: chirpComnCfg 50 0 0 128 1 38.25 1
+响应: mmwDemo:/>
+发送: chirpTimingCfg 4 28 1.5 102 57.5
+响应: mmwDemo:/>chirpComnCfg 50 0 0 128 1 38.25 1
+响应: Done
+发送: frameCfg 4 12 4000 32 200 0
+响应: mmwDemo:/>
+发送: factoryCalibCfg 1 0 38 3 0x1ff000
+响应: mmwDemo:/>chirpTimingCfg 4 28 1.5 102 57.5
+响应: Done
+发送: runtimeCalibCfg 0
+响应: mmwDemo:/>
+发送: runningMode 2 1
+响应: mmwDemo:/>frameCfg 4 12 4000 32 200 0
+响应: Done
+发送: sigProcChainCommonCfg 4 32 200 0 0
+响应: mmwDemo:/>
+发送: macroDopplerCfg 1 20
+响应: mmwDemo:/>factoryCalibCfg 1 0 38 3 0x1ff000
+响应: Done
+发送: guiMonitor 1 0 1 0 0 1 1 1
+响应: mmwDemo:/>
+发送: dynamicRACfarCfg 5 10 1 1 8 8 8 10 4 10 9.0 7.00 0.50 1 1
+响应: mmwDemo:/>runtimeCalibCfg 0
+响应: Done
+发送: dynamicRangeAngleCfg 8.000 0.04 2 0
+响应: mmwDemo:/>
+发送: dynamic2DAngleCfg 5 1 1 1.0 7.0 2
+响应: mmwDemo:/>runningMode 2 1
+响应: Done
+发送: dopplerBinSelCfg 1 32 0 4
+响应: mmwDemo:/>
+发送: antGeometry0 -2 -2 -3 -3   0  0 -1 -1    0  0 -1 -1   -2 -2 -3 -3
+响应: mmwDemo:/>sigProcChainCommonCfg 4 32 200 0 0
+响应: Done
+发送: antGeometry1  0 -1 -1  0   0 -1 -1  0   -2 -3 -3 -2   -2 -3 -3 -2
+响应: mmwDemo:/>
+发送: antPhaseRot 1 1 1 1  1 1 1 1  1 1 1 1  1 1 1 1
+响应: mmwDemo:/>macroDopplerCfg 1 20
+响应: Done
+发送: compRangeBiasAndRxChanPhase 0 1 0 1 0 1 0 1 0 -1 0 -1 0 -1 0 -1 0 1 0 1 0 1 0 1 0 -1 0 -1 0 -1 0 -1 0
+响应: mmwDemo:/>
+发送: measureRangeBiasAndRxChanPhase 0 0 0
+响应: mmwDemo:/>guiMonitor 1 0 1 0 0 1 1 1
+响应: Done
+发送: staticRangeAngleCfg 1 1 1
+响应: mmwDemo:/>
+发送: fovCfg 73.0 73.0
+响应: mmwDemo:/>dynamicRACfarCfg 5 10 1 1 8 8 8 10 4 10 9.0 7.00 0.50 1 1
+响应: Done
+发送: sensorPosition 0 -0.05 0.12 0 65
+响应: mmwDemo:/>
+发送: cuboidDef  0  0   -0.3   0.3   -0.15  0.45   0.25   0.4
+响应: mmwDemo:/>dynamicRangeAngleCfg 8.000 0.04 2 0
+响应: Done
+发送: cuboidDef  0  1    -0.3   0.3   0.05   0.45    0.1    0.25
+响应: mmwDemo:/>
+发送: cuboidDef  0  2    -0.25   0.25   0.0   0.45   -0.15    0.1
+响应: mmwDemo:/>dynamic2DAngleCfg 5 1 1 1.0 7.0 2
+响应: Done
+发送: featExtrCfg 30 10 1 0 0.4 10
+响应: mmwDemo:/>
+发送: zOffsetCfg 0
+响应: mmwDemo:/>dopplerBinSelCfg 1 32 0 4
+响应: Done
+发送: macroDopMapScaleCfg 1.0
+响应: mmwDemo:/>
+发送: macroDopNumVoxelCfg 30
+响应: mmwDemo:/>antGeometry0 -2 -2 -3 -3   0  0 -1 -1    0  0 -1 -1   -2 -2 -3 -3
+响应: Done
+发送: macroDopRngBinOffsetCfg 1
+响应: mmwDemo:/>
+发送: lowPowerCfg 0
+响应: mmwDemo:/>antGeometry1  0 -1 -1  0   0 -1 -1  0   -2 -3 -3 -2   -2 -3 -3 -2
+响应: Done
+发送: baudRate 6250000
+响应: mmwDemo:/>
+更改数据端口波特率: 1250000 -> 6250000
+---数据端口波特率已更新: 6250000 baud
+保存: sensorStart 0 0 0 0
+============================================================
+配置文件发送完成
+
+启动传感器: sensorStart 0 0 0 0
+ ----雷达传感器已启动
+
+---雷达配置成功
+
+开始接收并解析数据...
+日志文件: radar_data/radar_parse_20260625_130543.log
+按 Ctrl+C 停止
+
+帧: 0, total_points: 0, total_MB: 0.00 MB, 速率: 1.15 KB/s
+帧: 0, total_points: 0, total_MB: 0.00 MB, 速率: 4.52 KB/s
+帧: 0, total_points: 0, total_MB: 0.00 MB, 速率: 7.89 KB/s
+帧: 0, total_points: 0, total_MB: 0.00 MB, 速率: 11.18 KB/s
+帧: 0, total_points: 0, total_MB: 0.00 MB, 速率: 13.31 KB/s
+帧: 0, total_points: 0, total_MB: 0.00 MB, 速率: 14.34 KB/s
+帧: 0, total_points: 0, total_MB: 0.00 MB, 速率: 17.54 KB/s
+帧: 10, total_points: 4561, total_MB: 0.04 MB, 速率: 21.12 KB/s
+帧: 10, total_points: 4561, total_MB: 0.04 MB, 速率: 20.00 KB/s
+帧: 10, total_points: 4561, total_MB: 0.04 MB, 速率: 20.32 KB/s
+帧: 10, total_points: 4561, total_MB: 0.04 MB, 速率: 20.58 KB/s
+帧: 10, total_points: 4561, total_MB: 0.05 MB, 速率: 20.91 KB/s
+帧: 10, total_points: 4561, total_MB: 0.05 MB, 速率: 20.95 KB/s
+帧: 10, total_points: 4561, total_MB: 0.05 MB, 速率: 21.33 KB/s
+帧: 20, total_points: 8899, total_MB: 0.08 MB, 速率: 20.95 KB/s
+帧: 20, total_points: 8899, total_MB: 0.08 MB, 速率: 20.34 KB/s
+帧: 20, total_points: 8899, total_MB: 0.08 MB, 速率: 20.51 KB/s
+帧: 20, total_points: 8899, total_MB: 0.09 MB, 速率: 20.67 KB/s
+帧: 20, total_points: 8899, total_MB: 0.09 MB, 速率: 20.87 KB/s
+帧: 20, total_points: 8899, total_MB: 0.09 MB, 速率: 20.90 KB/s
+帧: 20, total_points: 8899, total_MB: 0.09 MB, 速率: 21.09 KB/s
+帧: 30, total_points: 13328, total_MB: 0.12 MB, 速率: 21.05 KB/s
+帧: 30, total_points: 13328, total_MB: 0.12 MB, 速率: 20.57 KB/s
+帧: 30, total_points: 13328, total_MB: 0.13 MB, 速率: 20.68 KB/s
+帧: 30, total_points: 13328, total_MB: 0.13 MB, 速率: 20.78 KB/s
+帧: 30, total_points: 13328, total_MB: 0.13 MB, 速率: 20.87 KB/s
+帧: 30, total_points: 13328, total_MB: 0.13 MB, 速率: 20.99 KB/s
+帧: 30, total_points: 13328, total_MB: 0.13 MB, 速率: 20.91 KB/s
+帧: 40, total_points: 17376, total_MB: 0.16 MB, 速率: 20.74 KB/s
+帧: 40, total_points: 17376, total_MB: 0.16 MB, 速率: 20.40 KB/s
+帧: 40, total_points: 17376, total_MB: 0.16 MB, 速率: 20.47 KB/s
+帧: 40, total_points: 17376, total_MB: 0.17 MB, 速率: 20.56 KB/s
+帧: 40, total_points: 17376, total_MB: 0.17 MB, 速率: 20.67 KB/s
+帧: 40, total_points: 17376, total_MB: 0.17 MB, 速率: 20.74 KB/s
+帧: 40, total_points: 17376, total_MB: 0.17 MB, 速率: 20.79 KB/s
+^C
+
+接收已停止
+总计帧数: 45
+总计点数: 19506
+数据量: 192128 字节 (0.18 MB)
+接收时长: 9.11 秒
+平均速率: 20.59 KB/s
+错误帧数: 0
+日志已保存到: radar_data/radar_parse_20260625_130543.log
+控制端口已断开
+数据端口已断开
+
