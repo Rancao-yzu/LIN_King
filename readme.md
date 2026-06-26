@@ -1,4 +1,4 @@
-# LIN_King — USBCANFD LIN 通道 Python 通信库
+# LIN_King — USBCANFD LIN 通道 Python 通信库(包含Ti串口通信)
 
 基于 ZLG USBCANFD 系列设备 (100U) 的 LIN 总线通信 Python 封装。
 
@@ -20,7 +20,8 @@ LIN_King/
 
 ---
 使用前必读！
-> linux下的驱动文件见  __lib/usbcanfd_libusb_x64_1.0.13_260316.zip  
+> linux下的驱动文件见 (docx/usbcanfd_libusb_x64_1.0.13_260316.zip) 
+> 
 > [build.md](docx/build.md) - 驱动安装指南;  
 > [Lin.md](docx/Lin.md) - 通信原理  
 > [UART_Serial_6844](docx/6844通信.md) - 串口通信(Ti)

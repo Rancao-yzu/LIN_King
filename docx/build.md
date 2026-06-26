@@ -31,7 +31,7 @@ sudo cp libusbcanfd.so libzuds.so /lib
 ```
 
 ## 五、创建软链接
-
+软链接以自己的实际so版本为准，**以下命令仅供参考！！！！！！**
 ```bash
 sudo ln -s /lib/libusbcanfd.so /lib/libusbcanfd.so.1.0.13
 sudo ln -s /lib/libzuds.so /lib/libzuds.so.20231025
