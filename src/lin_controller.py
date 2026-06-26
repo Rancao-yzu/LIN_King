@@ -14,7 +14,7 @@ class LinController:
     """LIN 总线控制器 — 所有业务逻辑集中在此"""
 
     def __init__(self):
-        self._driver = LinDriver()
+        self._driver = LinDriver(chn=1, baud=9600)
         self._driver.set_rx_callback(self._on_rx)
 
         self._connected = False
