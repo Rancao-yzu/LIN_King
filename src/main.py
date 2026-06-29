@@ -10,8 +10,7 @@ from gui_styles import (
     ORANGE_PRIMARY, ORANGE_ACCENT,LOG_COLORS, SECTION_GAP,FlatButton,
 )
 from protocol import (
-    FRAME_NAME, format_hex,
-    LEARN_STATUS_TEXT, OBSTACLE_TEXT, RADAR_FAULT_TEXT,
+    FRAME_NAME, format_hex, LEARN_STATUS_TEXT
 )
 from lin_controller import LinController
 
@@ -68,18 +67,18 @@ class ControlPanel(ttk.LabelFrame):
         self._frame_combo.bind('<<ComboboxSelected>>', self._update_preview)
         row += 1
 
-        # DATA[0] 自学习状态
-        self._cbo_d0 = self._add_combo(row, "DATA[0] 电机自学习:",
+        # DATA[0] bit0-1 电机自学习状态
+        self._cbo_d0 = self._add_combo(row, "DATA[0] bit0-1 电机自学习:",
             ["默认值 (0x00)", "电机进行自学习 (0x01)", "电机不进行自学习 (0x02)"])
         row += 1
 
-        # DATA[1] 电机动作
-        self._cbo_d1 = self._add_combo(row, "DATA[1] 电机动作:",
+        # DATA[0] bit2-3 电机动作
+        self._cbo_d1 = self._add_combo(row, "DATA[0] bit2-3 电机动作:",
             ["默认值 (0x00)", "电机转动伸出 (0x01)", "电机转动收回 (0x02)", "电机停止转动 (0x03)"])
         row += 1
 
-        # DATA[2] 障碍物
-        self._cbo_d2 = self._add_combo(row, "DATA[2] 障碍物:",
+        # DATA[0] bit4-5 障碍物
+        self._cbo_d2 = self._add_combo(row, "DATA[0] bit4-5 障碍物:",
             ["默认值 (0x00)", "无障碍物 (0x01)", "有障碍物 (0x02)"])
         row += 1
 
@@ -120,20 +119,6 @@ class ControlPanel(ttk.LabelFrame):
         self._btn_motor_poll_stop.grid(row=row, column=1, padx=4, pady=3)
         row += 1
 
-        # ---- 雷达轮询 ----
-        ttk.Label(self, text="▸ 雷达轮询", font=('Microsoft YaHei', 9, 'bold'),
-                  foreground=ORANGE_PRIMARY, background=BG_CARD).grid(
-            row=row, column=0, columnspan=2, sticky='w', padx=4, pady=(6, 2))
-        row += 1
-
-        self._btn_radar_poll_start = _btn(self, "开始", self._ctrl.start_radar_polling,
-                                          bg=LOG_COLORS["RECV"], hover=LOG_COLORS["OK"])
-        self._btn_radar_poll_start.grid(row=row, column=0, padx=4, pady=3)
-
-        self._btn_radar_poll_stop = _btn(self, "停止", self._ctrl.stop_radar_polling,
-                                         bg=LOG_COLORS["ERROR"], hover=ORANGE_ACCENT)
-        self._btn_radar_poll_stop.grid(row=row, column=1, padx=4, pady=3)
-        row += 1
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
@@ -157,24 +142,24 @@ class ControlPanel(ttk.LabelFrame):
 
     def _update_preview(self, event=None):
         fid = self._get_combo_val(self._frame_combo)
-        d0 = self._get_combo_val(self._cbo_d0)
-        d1 = self._get_combo_val(self._cbo_d1)
-        d2 = self._get_combo_val(self._cbo_d2)
-        data_str = f"{d0:02X} {d1:02X} {d2:02X} 00 00 00 00 00"
+        learn_val = self._get_combo_val(self._cbo_d0)
+        motor_action_val = self._get_combo_val(self._cbo_d1)
+        obstacle_val = self._get_combo_val(self._cbo_d2)
+        d0 = (obstacle_val << 4) | (motor_action_val << 2) | learn_val
+        data_str = f"{d0:02X} 00 00 00 00 00 00 00"
         self._preview_label.config(
-            text=f"预览: ID=0x{fid:02X}  Data: {data_str}")
+            text=f"预览: ID=0x{fid:02X}   Data: {data_str}")
 
     def _on_connect(self):
         self._ctrl.connect()
 
     def _on_send(self):
         fid = self._get_combo_val(self._frame_combo)
-        data = [
-            self._get_combo_val(self._cbo_d0),
-            self._get_combo_val(self._cbo_d1),
-            self._get_combo_val(self._cbo_d2),
-            0, 0, 0, 0, 0,
-        ]
+        learn_val = self._get_combo_val(self._cbo_d0)
+        motor_action_val = self._get_combo_val(self._cbo_d1)
+        obstacle_val = self._get_combo_val(self._cbo_d2)
+        d0 = (obstacle_val << 4) | (motor_action_val << 2) | learn_val
+        data = [d0, 0, 0, 0, 0, 0, 0, 0]
         self._ctrl.send_custom(fid, data, repeat=self._repeat_var.get())
 
 
@@ -223,16 +208,6 @@ class StatusPanel(ttk.LabelFrame):
             row=row, column=0, columnspan=2, sticky='ew', pady=8, padx=4)
         row += 1
 
-        # 雷达状态
-        ttk.Label(self, text="雷达状态", font=('Microsoft YaHei', 9, 'bold'),
-                  foreground=ORANGE_PRIMARY, background=BG_CARD).grid(
-            row=row, column=0, columnspan=2, sticky='w', padx=4, pady=(2, 2))
-        row += 1
-
-        self._radar_labels = {}
-        for text, key in [("障碍物:", "obstacle"), ("故障:", "fault")]:
-            self._radar_labels[key] = self._add_field(row, text, "—")
-            row += 1
 
     def _add_field(self, row, label_text, value_text, value_color=TEXT_DARK):
         """添加一行 标签: 值"""
@@ -250,8 +225,6 @@ class StatusPanel(ttk.LabelFrame):
         else:
             self._conn_label.config(text="● 未连接", foreground=ORANGE_ACCENT)
             self.set_motor_polling(False)
-            self.set_radar_polling(False)
-
     def set_result(self, success: bool, message: str):
         color = "#27AE60" if success else "#E74C3C"
         tag = "✓" if success else "✗"
@@ -263,12 +236,6 @@ class StatusPanel(ttk.LabelFrame):
         else:
             self._motor_poll_label.config(text="○ 未启动", foreground=ORANGE_ACCENT)
 
-    def set_radar_polling(self, active: bool):
-        if active:
-            self._radar_poll_label.config(text="● 轮询中", foreground="#27AE60")
-        else:
-            self._radar_poll_label.config(text="○ 未启动", foreground=ORANGE_ACCENT)
-
     def set_motor_status(self, info: dict):
         self._motor_labels['learn'].config(
             text=LEARN_STATUS_TEXT.get(1 if info['learn_done'] else 0, "—"))
@@ -276,11 +243,6 @@ class StatusPanel(ttk.LabelFrame):
         self._motor_labels['stroke'].config(text=str(info['max_stroke']))
         self._motor_labels['fault'].config(text=f"0x{info['fault']:02X}")
 
-    def set_radar_status(self, info: dict):
-        self._radar_labels['obstacle'].config(
-            text=OBSTACLE_TEXT.get(info['obstacle'], f"0x{info['obstacle']:02X}"))
-        self._radar_labels['fault'].config(
-            text=RADAR_FAULT_TEXT.get(info['fault'], f"0x{info['fault']:02X}"))
 
 
 # 报文监视 (底部)
@@ -416,9 +378,7 @@ class LinApp:
         self._ctrl.set_on_log(self._on_log)
         self._ctrl.set_on_result(self._on_result)
         self._ctrl.set_on_motor_status(self._on_motor_status)
-        self._ctrl.set_on_radar_status(self._on_radar_status)
         self._ctrl.set_on_motor_polling(self._on_motor_polling)
-        self._ctrl.set_on_radar_polling(self._on_radar_polling)
 
     def _build_ui(self):
         # === 顶部区域: 控制面板(左) + 状态面板(右) ===
@@ -458,14 +418,9 @@ class LinApp:
     def _on_motor_status(self, info):
         self._status_panel.set_motor_status(info)
 
-    def _on_radar_status(self, info):
-        self._status_panel.set_radar_status(info)
-
     def _on_motor_polling(self, active):
         self._status_panel.set_motor_polling(active)
 
-    def _on_radar_polling(self, active):
-        self._status_panel.set_radar_polling(active)
 
     def _on_close(self):
         try:

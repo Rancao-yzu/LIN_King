@@ -6,27 +6,26 @@
 # ============================================================
 PID_MOTOR_CTRL   = 0x01  # 电机控制帧 (上位机 → 电机)
 PID_MOTOR_STATUS = 0x02  # 电机状态帧 (上位机 ↔ 电机)
-PID_RADAR_CTRL   = 0x03  # 雷达控制帧 (上位机 → 雷达)
-PID_RADAR_STATUS = 0x04  # 雷达状态帧 (上位机 ↔ 雷达)
 
 # ============================================================
-# DATA[0] — 电机自学习状态 (控制帧)
+# DATA[0] 位域定义 (控制帧)
+# bit0-1: 电机自学习状态
+# bit2-3: 电机运动状态  
+# bit4-5: 障碍物标志
 # ============================================================
+
+# bit0-1 — 电机自学习状态
 LEARN_DEFAULT = 0x00  # 默认值
 LEARN_DO      = 0x01  # 电机进行自学习
 LEARN_NO      = 0x02  # 电机不进行自学习
 
-# ============================================================
-# DATA[1] — 电机运动状态 (控制帧)
-# ============================================================
+# bit2-3 — 电机运动状态
 MOTION_DEFAULT  = 0x00  # 默认值
 MOTION_EXTEND   = 0x01  # 电机转动伸出
 MOTION_RETRACT  = 0x02  # 电机转动收回
 MOTION_STOP     = 0x03  # 电机停止转动
 
-# ============================================================
-# DATA[2] — 障碍物标志 (控制帧)
-# ============================================================
+# bit4-5 — 障碍物标志
 OBSTACLE_DEFAULT = 0x00  # 默认值 (算法未就绪 / 雷达故障)
 OBSTACLE_NONE    = 0x01  # 无障碍物
 OBSTACLE_EXISTS  = 0x02  # 有障碍物
@@ -51,7 +50,10 @@ SEND_INTERVAL_MS = 100  # 发送间隔 (ms)
 # ============================================================
 
 def format_hex(data, length=8):
-    """将字节列表格式化为十六进制字符串, 如 '01 00 00 ...'"""
+    """将字节列表格式化为十六进制字符串, 如 '01 00 00 ...'
+    空列表 (仅头部帧) 返回 '(仅头部)'"""
+    if not data:
+        return '(仅头部)'
     return ' '.join(f'{b:02X}' for b in data[:length])
 
 
@@ -62,19 +64,6 @@ def format_hex(data, length=8):
 FRAME_NAME = {
     PID_MOTOR_CTRL:   "电机控制",
     PID_MOTOR_STATUS: "电机状态",
-    PID_RADAR_CTRL:   "雷达控制",
-    PID_RADAR_STATUS: "雷达状态",
-}
-
-OBSTACLE_TEXT = {
-    OBSTACLE_DEFAULT: "未就绪",
-    OBSTACLE_NONE:    "无障碍",
-    OBSTACLE_EXISTS:  "有障碍",
 }
 
 LEARN_STATUS_TEXT = {LEARN_NOT_DONE: "未完成", LEARN_DONE: "已完成"}
-
-RADAR_FAULT_TEXT = {
-    RADAR_FAULT_NONE:    "无故障",
-    RADAR_FAULT_BLOCKED: "遮挡故障",
-}
