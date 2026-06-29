@@ -1,0 +1,21 @@
+<launch>
+  <!-- 雷达发布节点 -->
+  <node name="ti_radar_publisher" pkg="ti_radar_ros" type="ti_radar_publisher.py" output="screen">
+    <param name="control_port" value="/dev/ttyACM0" />
+    <param name="data_port" value="/dev/ttyACM1" />
+    <param name="control_baudrate" value="115200" />
+    <param name="data_baudrate" value="1250000" />
+    <param name="config_file" value="$(find ti_radar_ros)/config/cpd_bottomShafa_20260610_oneZone.cfg" />
+    <param name="frame_id" value="radar" />
+  </node>
+
+  <!-- 可视化节点 -->
+  <node name="radar_visualizer" pkg="ti_radar_ros" type="radar_visualizer.py" output="screen">
+    <param name="input_topic" value="/wf/radar/sofa_0" />
+    <param name="output_topic" value="/radar/pointcloud" />
+    <param name="frame_id" value="radar" />
+  </node>
+
+  <!-- RViz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ti_radar_ros)/config/radar.rviz" />
+</launch>
