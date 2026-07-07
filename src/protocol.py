@@ -58,6 +58,41 @@ def format_hex(data, length=8):
 
 
 # ============================================================
+# 帧描述 (供日志 [] 使用)
+# ============================================================
+
+# 电机动作文本
+_MOTION_TEXT = {0x00: None, 0x01: "伸出", 0x02: "回收", 0x03: "停止"}
+# 自学习文本
+_LEARN_TEXT  = {0x00: None, 0x01: "自学习", 0x02: "不自学习"}
+# 障碍物文本
+_OBS_TEXT    = {0x00: None, 0x01: "无障碍物", 0x02: "有障碍物"}
+
+
+def describe_frame(frame_id, data):
+    """解析帧数据, 返回 [] 内的描述文本"""
+    if frame_id == PID_MOTOR_CTRL and data:
+        d0 = data[0]
+        motion = (d0 >> 2) & 0x03
+        learn  = d0 & 0x03
+        obs    = (d0 >> 4) & 0x03
+        parts = [v for v in (_MOTION_TEXT.get(motion),
+                             _LEARN_TEXT.get(learn),
+                             _OBS_TEXT.get(obs)) if v]
+        return "，".join(parts) if parts else "空闲"
+
+    if frame_id == PID_MOTOR_STATUS and len(data) >= 6:
+        learn_flag = "✓自学习" if data[0] == 0x01 else "✗未学习"
+        pos = data[1] | (data[2] << 8)
+        stroke = data[3] | (data[4] << 8)
+        fault = data[5]
+        fault_str = f"故障0x{fault:02X}" if fault else "无故障"
+        return f"{learn_flag} 位置{pos} 行程{stroke} {fault_str}"
+
+    return FRAME_NAME.get(frame_id, f"0x{frame_id:02X}")
+
+
+# ============================================================
 # 描述映射 (供 UI 使用)
 # ============================================================
 

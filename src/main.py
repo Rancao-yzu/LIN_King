@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """LIN 沙发项目 — 上位机控制界面 (tkinter/ttk + 自定义扁平按钮)"""
 
+import os
 import tkinter as tk
 from tkinter import ttk
 from datetime import datetime
@@ -10,7 +11,7 @@ from gui_styles import (
     ORANGE_PRIMARY, ORANGE_ACCENT,LOG_COLORS, SECTION_GAP,FlatButton,
 )
 from protocol import (
-    FRAME_NAME, format_hex, LEARN_STATUS_TEXT
+    FRAME_NAME, format_hex, LEARN_STATUS_TEXT, describe_frame
 )
 from lin_controller import LinController
 
@@ -247,7 +248,7 @@ class StatusPanel(ttk.LabelFrame):
             self.set_motor_polling(False)
     def set_result(self, success: bool, message: str):
         color = "#27AE60" if success else "#E74C3C"
-        tag = "✓" if success else "✗"
+        tag = "OK" if success else "ERROR"
         self._result_label.config(text=f"{tag} {message}", foreground=color)
 
     def set_motor_polling(self, active: bool):
@@ -271,8 +272,20 @@ class MessageLog(ttk.LabelFrame):
 
     MAX_LINES = 500
 
-    def __init__(self, parent):
+    def __init__(self, parent, log_dir=None):
         super().__init__(parent, text="报文监控  RX / TX", style='Card.TLabelframe')
+
+        # 日志文件
+        self._log_file = None
+        if log_dir:
+            os.makedirs(log_dir, exist_ok=True)
+            date_str = datetime.now().strftime('%Y-%m-%d')
+            log_path = os.path.join(log_dir, f"lin_log_{date_str}.txt")
+            self._log_file = open(log_path, 'a', encoding='utf-8')
+            self._log_file.write(f"\n{'='*60}\n")
+            self._log_file.write(f"  LIN King 日志 — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            self._log_file.write(f"{'='*60}\n\n")
+            self._log_file.flush()
 
         # 工具栏 (扁平按钮)
         toolbar = ttk.Frame(self, style='Card.TFrame')
@@ -334,12 +347,20 @@ class MessageLog(ttk.LabelFrame):
 
         def _do():
             try:
-                self._text.configure(state='normal')
                 now = datetime.now().strftime('%H:%M:%S.%f')[:-3]
+                line = f"[{now}] [{tag}] {message}"
+
+                # 写入 GUI
+                self._text.configure(state='normal')
                 self._text.insert('end', f"[{now}] ", "TIME")
                 self._text.insert('end', f"{message}\n", tag)
                 self._text.configure(state='disabled')
                 self._text.see('end')
+
+                # 写入文件日志
+                if self._log_file:
+                    self._log_file.write(line + '\n')
+                    self._log_file.flush()
 
                 self._line_count += 1
                 if self._line_count > self.MAX_LINES:
@@ -353,12 +374,12 @@ class MessageLog(ttk.LabelFrame):
         self._text.after(0, _do)
 
     def append_tx(self, frame_id, data):
-        name = FRAME_NAME.get(frame_id, f"0x{frame_id:02X}")
-        self.append("TX", f"TX  ID:0x{frame_id:02X} [{name}]  {format_hex(data)}")
+        desc = describe_frame(frame_id, data)
+        self.append("TX", f"TX  ID:0x{frame_id:02X} [{desc}]  {format_hex(data)}")
 
     def append_rx(self, frame_id, data):
-        name = FRAME_NAME.get(frame_id, f"0x{frame_id:02X}")
-        self.append("RX", f"RX  ID:0x{frame_id:02X} [{name}]  {format_hex(data)}")
+        desc = describe_frame(frame_id, data)
+        self.append("RX", f"RX  ID:0x{frame_id:02X} [{desc}]  {format_hex(data)}")
 
     def append_info(self, text):
         self.append("INFO", text)
@@ -368,6 +389,15 @@ class MessageLog(ttk.LabelFrame):
 
     def append_error(self, text):
         self.append("ERR", text)
+
+    def close_log(self):
+        """关闭日志文件"""
+        if self._log_file:
+            self._log_file.write(f"\n{'='*60}\n")
+            self._log_file.write(f"  日志结束 — {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            self._log_file.write(f"{'='*60}\n")
+            self._log_file.close()
+            self._log_file = None
 
 
 # 主窗口
@@ -414,7 +444,9 @@ class LinApp:
                                 padx=(SECTION_GAP // 2, 0))
 
         # === 底部区域: 报文日志 ===
-        self._msg_log = MessageLog(self._root)
+        # 日志输出目录 (src 同级 OUT/)
+        log_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'OUT')
+        self._msg_log = MessageLog(self._root, log_dir=log_dir)
         self._msg_log.pack(fill='both', expand=True,
                            padx=SECTION_GAP, pady=SECTION_GAP)
 
@@ -445,6 +477,10 @@ class LinApp:
     def _on_close(self):
         try:
             self._ctrl.disconnect()
+        except Exception:
+            pass
+        try:
+            self._msg_log.close_log()
         except Exception:
             pass
         self._root.destroy()
