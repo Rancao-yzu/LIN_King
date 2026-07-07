@@ -99,6 +99,17 @@ class ControlPanel(ttk.LabelFrame):
             row=row, column=1, padx=4, pady=4)
         row += 1
 
+        # ---- 快捷电机按钮 ----
+        quick_frame = ttk.Frame(self, style='Card.TFrame')
+        quick_frame.grid(row=row, column=0, columnspan=2, sticky='ew', padx=4, pady=3)
+        _btn(quick_frame, "伸出", lambda: self._quick_motor_action(1), width=72,
+             bg="#27AE60", hover="#2ECC71").pack(side='left', padx=(0, 3))
+        _btn(quick_frame, "回收", lambda: self._quick_motor_action(2), width=72,
+             bg="#E67E22", hover="#F39C12").pack(side='left', padx=3)
+        _btn(quick_frame, "停止", lambda: self._quick_motor_action(3), width=72,
+             bg="#E74C3C", hover="#C0392B").pack(side='left', padx=(3, 0))
+        row += 1
+
         # ---- 分隔 ----
         ttk.Separator(self, orient='horizontal').grid(
             row=row, column=0, columnspan=2, sticky='ew', pady=8, padx=4)
@@ -152,6 +163,15 @@ class ControlPanel(ttk.LabelFrame):
 
     def _on_connect(self):
         self._ctrl.connect()
+
+    def _quick_motor_action(self, action_index):
+        """快捷电机动作: 1=伸出, 2=回收, 3=停止"""
+        self._frame_combo.current(0)   # 电机控制帧 (0x01)
+        self._cbo_d1.current(action_index)
+        # 伸出/回收时电机不能自学习
+        self._cbo_d0.current(2)    # 电机不进行自学习 (0x02)
+        self._update_preview()
+        self._on_send()
 
     def _on_send(self):
         fid = self._get_combo_val(self._frame_combo)

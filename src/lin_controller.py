@@ -31,6 +31,10 @@ class LinController:
         self._motor_poll_stop = False
         self._motor_polling = False
 
+        self.connect()
+        time.sleep(0.5)
+        self.disconnect()
+
 
     # 回调注册
     def set_on_log(self, cb):
