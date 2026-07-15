@@ -104,6 +104,9 @@ class LinController:
         """send_custom 的实际执行体 (子线程).
         防丢重发: 只配置一次响应数据 (SetLINPublish), 然后连续发送5次帧头.
         重复调用 SetLINPublish 会导致硬件配置混乱, 破坏报文发送."""
+        if not self._connected:
+            self._emit_result(False, "设备未连接, 无法发送")
+            return
         tag = f"ID=0x{frame_id:02X}"
         try:
             if repeat:
@@ -152,6 +155,12 @@ class LinController:
         """电机状态轮询循环 — 仅发送帧头, 等待电机从站响应数据.
         TX 日志由接收线程的回环统一记录."""
         while not self._motor_poll_stop:
+            if not self._connected:
+                self._motor_poll_stop = True
+                self._motor_polling = False
+                if self._cb_motor_polling:
+                    self._cb_motor_polling(False)
+                break
             try:
                 self._driver.send_header(PID_MOTOR_STATUS)
             except Exception:
